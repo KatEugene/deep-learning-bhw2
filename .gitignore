@@ -1,0 +1,14 @@
+test.ipynb
+__pycache__
+outputs
+checkpoints
+kaggle_submit
+wandb
+*.ipynb
+*.pth
+*.sh
+good_checkpoint
+.vscode
+wandb
+kaggle_submit
+init_kaggle_submit.py
