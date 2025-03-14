@@ -21,7 +21,7 @@ def train():
     optimizer = torch.optim.Adam(**config.optimizer, params=model.parameters())
     lr_scheduler = WarmUpScheduler(**config.lr_scheduler, optimizer=optimizer, epoch_len=len(dataloaders["train"]))
     wandb_tracker = WandbTracker(**config.wandb_tracker, project_config=config)
-    wandb_tracker.log_config(ROOT_PATH / "config.yaml")
+    wandb_tracker.log_config(ROOT_PATH / "src/utils/globals.py")
     wandb_tracker.log_config(ROOT_PATH / "src/model/transformer.py")
     trainer = Trainer(
         config=config,

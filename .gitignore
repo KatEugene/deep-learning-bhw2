@@ -12,3 +12,4 @@ good_checkpoint
 wandb
 kaggle_submit
 init_kaggle_submit.py
+*.txt
