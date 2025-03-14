@@ -80,7 +80,7 @@ dict_config = {
         "log_period": 50,
         "epoch_period": 5,
         "save_period": 5,
-        "n_epochs": 20,
+        "n_epochs": 1,
         "resume_from": None,
         "early_stop": None,
         "to_device": ["src_text", "trg_text"],
