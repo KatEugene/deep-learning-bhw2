@@ -28,11 +28,6 @@ class PositionalEncoding(nn.Module):
 class LanguageModel(nn.Module):
     def __init__(self, input_dim, output_dim, d_model, nhead, num_encoder_layers, num_decoder_layers, dim_feedforward, dropout, decoders, max_seq_len, max_generated_length):
         super(LanguageModel, self).__init__()
-        print(input_dim)
-        print(output_dim)
-        print(nhead)
-        print(max_seq_len)
-        print(max_generated_length)
         self.source_embedding = nn.Embedding(input_dim, d_model)
         self.target_embedding = nn.Embedding(input_dim, d_model)
         self.positional_encoding = PositionalEncoding(max_seq_len, d_model)
