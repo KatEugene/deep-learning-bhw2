@@ -45,10 +45,11 @@ class Trainer:
         try:
             self._train()
         except Exception:
-            self._save_checkpoint(self.last_epoch)
-            raise
+            self._save_checkpoint(self.last_epoch, is_best=True)
+            # raise
 
     def _train(self):
+        raise KeyError()
         not_improved_count = 0
         for epoch in range(self.start_epoch, self.epochs + 1):
             logs = self._train_epoch(epoch)
@@ -122,7 +123,6 @@ class Trainer:
             "optimizer": self.optimizer.state_dict(),
             "lr_scheduler": self.lr_scheduler.state_dict(),
             "best_metric": self.best_metric,
-            "config": self.config,
         }
         if is_best:
             path = self.checkpoint_dir / "model_best.pth"

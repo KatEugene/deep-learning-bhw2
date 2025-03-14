@@ -42,7 +42,7 @@ dict_config = {
         "eps": 1e-9
     },
     "dataloader": {
-        "batch_size": 2,
+        "batch_size": 64,
         "max_seq_len": 150,
         "train_size": 50,
         "max_vocab_size": 16000

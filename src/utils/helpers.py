@@ -21,6 +21,3 @@ class ConfigDict(dict):
         elif isinstance(value, list):
             return [ConfigDict(v) if isinstance(v, dict) else v for v in value]
         return value
-
-    # def __setattr__(self, key, value):
-    #     self[key] = value

@@ -36,7 +36,7 @@ def train():
 
 
 def inference():
-    set_random_seed(**config.globals.seed)
+    set_random_seed(config.globals.seed)
     device = "cuda" if torch.cuda.is_available() else "cpu"
     dataloaders, decoders = get_dataloaders(config)
     test_dataloader = dataloaders["test"]
