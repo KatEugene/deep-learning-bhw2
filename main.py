@@ -17,7 +17,6 @@ def train():
     dataloaders, decoders = get_dataloaders(config)
     model = LanguageModel(**config.model, decoders=decoders).to(device)
     criterion = CrossEntropyLossWrapper(**config.loss_function)
-    metrics = config.metrics
     optimizer = torch.optim.Adam(**config.optimizer, params=model.parameters())
     lr_scheduler = WarmUpScheduler(**config.lr_scheduler, optimizer=optimizer, epoch_len=len(dataloaders["train"]))
     wandb_tracker = WandbTracker(**config.wandb_tracker, project_config=config)
@@ -28,7 +27,6 @@ def train():
         device=device,
         model=model,
         criterion=criterion,
-        metrics=metrics,
         optimizer=optimizer,
         lr_scheduler=lr_scheduler,
         dataloaders=dataloaders,

@@ -36,27 +36,13 @@ dict_config = {
     "loss_function": {
         "label_smoothing": 0.1
     },
-    "metrics": {
-        "train": [
-            {
-                "name": "grad_norm",
-                "is_global": False
-            }
-        ],
-        "inference": [
-            {
-                "name": "bleu",
-                "is_global": True
-            }
-        ]
-    },
     "optimizer": {
         "lr": 3e-4,
         "betas": [0.9, 0.98],
         "eps": 1e-9
     },
     "dataloader": {
-        "batch_size": 64,
+        "batch_size": 2,
         "max_seq_len": 150,
         "train_size": 50,
         "max_vocab_size": 16000

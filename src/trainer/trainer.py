@@ -8,10 +8,9 @@ from src.metrics import MetricTracker
 
 
 class Trainer:
-    def __init__(self, model, criterion, metrics, optimizer, lr_scheduler, config, device, dataloaders, wandb_tracker):
+    def __init__(self, model, criterion, optimizer, lr_scheduler, config, device, dataloaders, wandb_tracker):
         self.model = model
         self.criterion = criterion
-        self.metrics = metrics
         self.optimizer = optimizer
         self.lr_scheduler = lr_scheduler
         self.config = config
@@ -19,16 +18,8 @@ class Trainer:
         self.train_dataloader = dataloaders["train"]
         self.valid_dataloader = dataloaders["valid"]
         self.wandb_tracker = wandb_tracker
-        self.train_tracker = MetricTracker(
-            self.criterion.name,
-            *[metric.name for metric in self.metrics.train],
-            wandb_tracker=self.wandb_tracker
-        )
-        self.valid_tracker = MetricTracker(
-            self.criterion.name,
-            *[metric.name for metric in self.metrics.inference],
-            wandb_tracker=self.wandb_tracker
-        )
+        self.train_tracker = MetricTracker(self.criterion.name, self.wandb_tracker)
+        self.valid_tracker = MetricTracker(self.criterion.name, self.wandb_tracker)
 
         self.mode = 'train'
         self.epochs = self.config.trainer.n_epochs
@@ -100,11 +91,6 @@ class Trainer:
             for _, batch in tqdm(enumerate(self.valid_dataloader), desc="valid", total=len(self.valid_dataloader)):
                 self.process_batch(batch, self.valid_tracker, logging_global)
 
-            if logging_global:
-                for metric in self.metrics[self.mode]:
-                    if metric.is_global:
-                        self.valid_tracker.update(metric.name, metric.get_score())
-
             self.wandb_tracker.set_step(epoch * self.epoch_len, "valid")
             self._log_batch(batch, self.valid_tracker, epoch, logging_global)
 
@@ -125,10 +111,8 @@ class Trainer:
             translation_texts = batch["decoded_translation_text"]
             self.wandb_tracker.log_translation(src_texts, trg_texts, translation_texts)
 
-        banned_names = self._get_banned_metrics(epoch)
         for metric_name in metric_tracker.keys():
-            if metric_name not in banned_names:
-                self.wandb_tracker.log_scalar(metric_name, metric_tracker.avg(metric_name))
+            self.wandb_tracker.log_scalar(metric_name, metric_tracker.avg(metric_name))
 
     def _save_checkpoint(self, epoch, is_best=False):
         state = {
@@ -180,24 +164,10 @@ class Trainer:
             batch.update(decoded_texts)
 
         metric_tracker.update(self.criterion.name, batch['loss'].item())
-
         batch['parameters'] = self.model.parameters()
-        for metric in self.metrics[self.mode]:
-            if not metric.is_global or logging_global:
-                n = not metric.is_global
-                metric_tracker.update(metric.name, metric(**batch), n)
 
     def _move_batch_to_device(self, batch):
         for tensor in self.config.trainer.to_device:
             batch[tensor] = batch[tensor].to(self.device)
 
-    def _is_metric_banned(self, metric, epoch):
-        not_global = not metric.is_global
-        correct_epoch = (metric.is_global and epoch % self.epoch_period == 0)
-        return not (not_global or correct_epoch)
 
-    def _get_banned_metrics(self, epoch):
-        filter_banned_metrics = partial(self._is_metric_banned, epoch=epoch)
-        banned_metrics = list(filter(filter_banned_metrics, self.metrics[self.mode]))
-        banned_names = list(map(lambda metric: metric.name, banned_metrics))
-        return banned_names
